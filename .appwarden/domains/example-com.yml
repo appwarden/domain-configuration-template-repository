@@ -1,0 +1,39 @@
+hostname: example.com
+version: 1
+dns:
+  options:
+    links: []
+  monitors:
+    - name: example.com
+      type: A
+      content:
+        - content: 23.192.228.80
+          comment: this is the first nested record
+        - content: 23.192.228.84
+    - name: example.com
+      type: AAAA
+      content:
+        - content: 2600:1406:3a00:21::173e:2e65
+    - name: example.com
+      type: MX
+      content: 0 .
+    - name: example.com
+      type: NS
+      content:
+        - content: a.iana-servers.net.
+        - content: b.iana-servers.net.
+    - name: example.com
+      type: SOA
+      content: ns.icann.org. noc.dns.icann.org.
+      validator: starts-with
+    - name: example.com
+      type: TXT
+      content:
+        - content: v=spf1 -all
+websites:
+  monitors:
+    - url: example.com
+      status: 200
+      headers:
+        - name: content-type
+          value: text/html
