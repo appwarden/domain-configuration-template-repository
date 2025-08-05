@@ -1,0 +1,106 @@
+name: Initialize Appwarden Domain Configuration File
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain name to create domain configuration file for (e.g., example.com)'
+        required: true
+        type: string
+        default: 'example.com'
+
+jobs:
+  initialize-appwarden:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js and install dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate domain format
+        run: |
+          domain="${{ github.event.inputs.domain }}"
+          
+          # Basic domain validation regex
+          if [[ ! $domain =~ ^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$ ]]; then
+            echo "Error: Invalid domain format. Please use a valid domain like 'example.com'"
+            exit 1
+          fi
+          
+          # Check if domain contains at least one dot
+          if [[ ! $domain == *.* ]]; then
+            echo "Error: Domain must contain at least one dot (e.g., example.com)"
+            exit 1
+          fi
+          
+          echo "Domain validation passed: $domain"
+
+      - name: Run appwarden init
+        run: |
+          npx appwarden init -d "${{ github.event.inputs.domain }}"
+      
+      - name: Create branch name
+        id: branch
+        run: |
+          domain="${{ github.event.inputs.domain }}"
+          # Replace dots and special characters with hyphens for branch name
+          branch_name="appwarden-init-$(echo $domain | sed 's/[^a-zA-Z0-9]/-/g')"
+          echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
+      
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected after running appwarden init"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected after running appwarden init"
+          fi
+      
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout -b ${{ steps.branch.outputs.branch_name }}
+          git add .
+          git commit -m "Initialize Appwarden configuration for ${{ github.event.inputs.domain }}"
+          git push origin ${{ steps.branch.outputs.branch_name }}
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "Initialize Appwarden configuration for ${{ github.event.inputs.domain }}" \
+            --body "This PR initializes Appwarden configuration for the domain: \`${{ github.event.inputs.domain }}\`
+
+          ## Changes
+          - Ran \`appwarden init -d ${{ github.event.inputs.domain }}\`
+          - Generated configuration files for monitoring
+
+          ## Domain
+          **Domain:** ${{ github.event.inputs.domain }}
+
+          ---
+          *This PR was automatically created by the Appwarden Init GitHub Action.*" \
+            --base main \
+            --head ${{ steps.branch.outputs.branch_name }}
+      
+      - name: No changes detected
+        if: steps.changes.outputs.has_changes == 'false'
+        run: |
+          echo "No changes were made by appwarden init. No pull request will be created."
+          echo "This might happen if the configuration already exists or if the command didn't generate any files."
