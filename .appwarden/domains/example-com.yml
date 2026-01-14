@@ -7,24 +7,24 @@ dns:
     - name: example.com
       type: A
       content:
-        - content: 23.192.228.80
+        - content: 104.18.26.120
           comment: this is the first nested record
-        - content: 23.192.228.84
+        - content: 104.18.27.120
     - name: example.com
       type: AAAA
       content:
-        - content: 2600:1406:3a00:21::173e:2e65
+        - content: 2606:4700::6812:1a78
     - name: example.com
       type: MX
       content: 0 .
     - name: example.com
       type: NS
       content:
-        - content: a.iana-servers.net.
-        - content: b.iana-servers.net.
+        - content: hera.ns.cloudflare.com
+        - content: hera.ns.cloudflare.com
     - name: example.com
       type: SOA
-      content: ns.icann.org. noc.dns.icann.org.
+      content: elliott.ns.cloudflare.com. dns.cloudflare.com.
       validator: starts-with
     - name: example.com
       type: TXT
