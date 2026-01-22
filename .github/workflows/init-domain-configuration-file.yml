@@ -1,4 +1,4 @@
-name: Initialize Appwarden Domain Configuration File
+name: ⚡ Initialize Appwarden Domain Configuration File
 
 on:
   workflow_dispatch:
