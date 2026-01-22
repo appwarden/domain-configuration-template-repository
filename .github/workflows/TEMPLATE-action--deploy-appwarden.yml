@@ -14,12 +14,12 @@ on: workflow_dispatch
 env:
   # 2️⃣ Configure your deployment:
   #    - APPWARDEN_HOSTNAMES: JSON array of hostnames to deploy (e.g. '["example.com", "app.example.com"]')
-  #    - CLOUDFLARE_ACCOUNT_ID: Your Cloudflare account ID
+  #    - CLOUDFLARE_ACCOUNT_ID: Your Cloudflare account ID (set as a variable in Github)
   #    - APPWARDEN_API_TOKEN & CLOUDFLARE_API_TOKEN: Add as secrets (https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)
   #     - Create APPWARDEN_API_TOKEN in the [Appwarden dashboard](https://use.appwarden.io/?to=settings/monitoring)
   #     - Create CLOUDFLARE_API_TOKEN in the [Cloudflare dashboard](https://dash.cloudflare.com/profile/api-tokens) using the "Edit Cloudflare Workers" template
   APPWARDEN_HOSTNAMES: '["example.com"]'
-  CLOUDFLARE_ACCOUNT_ID: 00000000-0000-0000-0000-000000000000
+  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
   APPWARDEN_API_TOKEN: ${{ secrets.APPWARDEN_API_TOKEN }}
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
