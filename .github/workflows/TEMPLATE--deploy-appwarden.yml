@@ -52,12 +52,12 @@ jobs:
       - name: Build @appwarden/middleware
         uses: appwarden/build-cloudflare-action@v1
         with:
-          hostnames: ${{ env.APPWARDEN_HOSTNAMES }}
+          debug: true
           cloudflare-account-id: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
           appwarden-api-token: ${{ env.APPWARDEN_API_TOKEN }}
 
       # This deploys the Appwarden middleware to Cloudflare
-      - name: Deploy Cloudflare worker script
+      - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3.14.1
         env:
           APPWARDEN_API_TOKEN: ${{ env.APPWARDEN_API_TOKEN }}
@@ -69,3 +69,7 @@ jobs:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
           secrets: |
             APPWARDEN_API_TOKEN
+
+      - name: Deployment successful
+        run: |
+          echo "::notice::✅ Appwarden middleware deployed successfully! View your worker in the Cloudflare dashboard: https://dash.cloudflare.com/${{ env.CLOUDFLARE_ACCOUNT_ID }}/workers/services/view/appwarden-production/production"
