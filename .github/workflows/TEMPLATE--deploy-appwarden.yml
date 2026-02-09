@@ -50,7 +50,7 @@ jobs:
 
       # This builds the Appwarden middleware for Cloudflare
       - name: Build @appwarden/middleware
-        uses: appwarden/build-cloudflare-action@v1
+        uses: appwarden/build-cloudflare-action@v3
         with:
           debug: true
           cloudflare-account-id: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
