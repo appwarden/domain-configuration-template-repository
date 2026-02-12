@@ -48,6 +48,7 @@ jobs:
 
       # This builds the Appwarden middleware for Cloudflare
       - name: Build @appwarden/middleware
+        id: build
         uses: appwarden/build-cloudflare-action@v3
         with:
           debug: true
@@ -70,4 +71,4 @@ jobs:
 
       - name: Deployment successful
         run: |
-          echo "::notice::✅ Appwarden middleware deployed successfully! View your worker in the Cloudflare dashboard: https://dash.cloudflare.com/${{ env.CLOUDFLARE_ACCOUNT_ID }}/workers/services/view/appwarden-production/production"
+          echo "::notice::✅ Appwarden middleware v${{ steps.build.outputs.middlewareVersion }} deployed successfully to: ${{ steps.build.outputs.hostnames }} | View in Cloudflare dashboard: https://dash.cloudflare.com/${{ env.CLOUDFLARE_ACCOUNT_ID }}/workers-and-pages"
